@@ -26,7 +26,9 @@ module Data.Lens.Zipper (
 
 {- TODO
 -      - excellent rewrite rules
--      - more advanced motions a.la. pez
+-      - consider a newtype-wrapped submodule encapsulating monad return value
+-      - more advanced motions a.la. pez?
+-      - better demos
 -}
 
 import Data.Yall.Lens

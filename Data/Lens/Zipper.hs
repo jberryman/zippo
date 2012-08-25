@@ -11,7 +11,7 @@ module Data.Lens.Zipper (
 -}
 
   -- * Zipper type
-    Zipper
+    Zipper(..)
   -- ** Zipper history 
   , Top , (:>) , Hist
 

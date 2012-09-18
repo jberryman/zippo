@@ -23,8 +23,8 @@ test1 = do
     let tr0 = Br (Br Nil 1 (Br Nil 2 Nil)) 3 (Br Nil 4 Nil)
     print tr0
     let z = zipper tr0
-        -- this is required if we don't use type equality constraints from
-        -- TypeFamilies:
+        -- this would have been required if we hadn't used type equality
+        -- constraints from TypeFamilies:
         --zops :: Zipper Top (Tree Int) -> Tree Int
         incNode = moveP node >>> modf (+1) >>> moveUp
         zops = incNode >>> moveP lBranch >>> moveP rBranch >>> incNode >>> 

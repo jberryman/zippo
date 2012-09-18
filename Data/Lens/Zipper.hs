@@ -13,22 +13,52 @@ module Data.Lens.Zipper (
   -- * Zipper type
     Zipper(..)
   -- ** Zipper history 
-  , Top , (:>) , Hist
+{- |
+   These three types make up the heterogenous history stack, and the programmer
+   should never need to use them directly. They come together with 'Zipper' to
+   form types that look like, e.g.
+    
+   > -- a zipper on a Tree, with focus on a leaf "a" of a 2nd level subtree
+   > z :: Zipper (Top :> Tree a :> Tree a) a
+    
+   This zipper works conceptually like the \"breacrumbs\" navigation UI design
+   pattern, and the types reflect this visually.
+    
+   Nevertheless user-provided type annotations should almost never be
+   necessary, so these will probably never appear in your code.
+-}
+  , Top(..) , (:>)(..) , Hist(..)
 
   -- * Zipper operations
   , zipper , close
   -- ** Motions
   , move , moveP , moveUp
   -- ** Focus
+{- |
+   In addition to these, 'viewf' can be used to view the focus.
+-}
   , focus , setf , modf
 
  ) where
 
 {- TODO
+-      - either switch to new lens lib, or add TH to your own
 -      - excellent rewrite rules
+-          - first look at core output of simple example
+-          - add rules one-by-one, looking at core
+-      - change moveP -> pmove?
 -      - consider a newtype-wrapped submodule encapsulating monad return value
+-          what we really want is a notation like:
+-              move x
+-              move y
+-              foc <- move z
+-              moveUp 
+-              modf (+foc)
+-          quasiquotation, or can we shoe-horn this into proc notation? 
+-          otherwise add those combinators (in notes)
 -      - more advanced motions a.la. pez?
 -      - better demos
+-      - pretty Show instance for Zipper
 -}
 
 import Data.Yall.Lens

@@ -41,24 +41,49 @@ module Data.Lens.Zipper (
 
  ) where
 
-{- TODO
--      - either switch to new lens lib, or add TH to your own
--      - excellent rewrite rules
--          - first look at core output of simple example
--          - add rules one-by-one, looking at core
--      - change moveP -> pmove?
--      - consider a newtype-wrapped submodule encapsulating monad return value
--          what we really want is a notation like:
--              move x
--              move y
--              foc <- move z
--              moveUp 
--              modf (+foc)
--          quasiquotation, or can we shoe-horn this into proc notation? 
--          otherwise add those combinators (in notes)
+{- TODO (PROBABLY NEVER)
+-      - test rewrite rules
+-      - combinators providing pleasant DSL for sequencing zipper ops.
 -      - more advanced motions a.la. pez?
 -      - better demos
 -      - pretty Show instance for Zipper
+-}
+
+{- REWRITE RULE POSSIBILITIES
+ -
+ - These may or may not be beneficial, and probably have to be defined
+ - in terms of custom combinators (see TODOs) to fire reliably.
+ -
+      1) moveUp $ moveUp $ modf/setf $ move y $ move x 
+           => moveUp $ modf/setf $ move (y . x)
+         i.e.
+          {-# RULE "down-down-modf-up-up/down-modf-up"  forall f x y z.moveUp $ moveUp $ modf f $ moveP y $ moveP x z = moveUp $ modf f $ moveP (y . x) z; #-}
+           
+      1b) close $          modf/setf $ move y $ move x
+           => close  $ modf/setf $ move (y . x)
+  
+      -- Possible?
+      1c?) move x >>> move y >>> modf/setf .^> (\a -> moveUp >>> moveUp >>> m)
+            => move (y . x) >>> modf/setf .^> (\a-> moveUp >>> m)
+  
+      -- 2. convert to lens operations on focus
+      --    These probably don't amount to optimizations.
+      2) moveUp $ setf/modf $ move x
+           => set/modify (x . focus)
+  
+      2b) close $ setf/modf $ move x
+           => close $ set/modify (x . focus)
+  
+      -- Possible?
+      2c) ...something akin to 1c
+  
+      3) close $ moveUp
+           => close
+      
+      -- 4. somehow, a bunch of lens set and modify ops (w/out and motions) 
+      -- sandwhiched between 'zipper' and 'close' could be extracted from zipper altogether
+      4?) zipper >>> modify (x . focus) >>> set (y . focus) >>> close
+           => modify x >>> set y
 -}
 
 import Data.Yall.Lens
@@ -129,3 +154,4 @@ moveP l = runIdentity . move l
 -- > moveUp (Zipper (Snoc st cont) c) = Zipper st $ cont c
 moveUp :: Zipper (st :> b) c -> Zipper st b
 moveUp (Zipper (Snoc st cont) c) = Zipper st $ cont c
+
